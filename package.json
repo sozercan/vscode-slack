@@ -1,0 +1,103 @@
+{
+	"name": "slack",
+	"displayName": "Slack integration",
+	"description": "Slack integration for Visual Studio Code",
+    "icon": "icon.png",
+	"version": "0.0.1",
+	"publisher": "sozercan",
+    "author": {
+        "name": "Sertac Ozercan",
+        "email": "sozercan@gmail.com",
+        "url": "http://sertacozercan.com"
+    },
+    "homepage": "https://github.com/sozercan/vscode-slack/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sozercan/vscode-slack"
+    },
+    "bugs": {
+        "url": "https://github.com/sozercan/vscode-slack/issues"
+    },
+    "license": "MIT",
+    "galleryBanner": {
+        "color": "#FFFFFF",
+        "theme": "light"
+    },
+	"engines": {
+		"vscode": "^0.10.1"
+	},
+	"categories": [
+		"Other"
+	],
+    "keywords": [
+        "Slack",
+        "chat",
+        "communication",
+        "collaboration"
+    ],
+	"activationEvents": [
+		"onCommand:extension.slackSendMsg",
+        "onCommand:extension.slackSendSelection",
+        "onCommand:extension.slackUploadFilePath",
+        "onCommand:extension.slackUploadFileCurrent",
+        "onCommand:extension.slackUploadFileSelection"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"commands": [{
+			"command": "extension.slackSendMsg",
+			"title": "Slack: Send Message"
+		},{
+        	"command": "extension.slackSendSelection",
+			"title": "Slack: Send Selection"
+        },{
+			"command": "extension.slackUploadFilePath",
+			"title": "Slack: Upload File From Path"
+		},{
+			"command": "extension.slackUploadFileCurrent",
+			"title": "Slack: Upload Current File"
+		},{
+			"command": "extension.slackUploadFileSelection",
+			"title": "Slack: Upload Selection as File"
+		}],
+        "keybindings": [{
+                "command": "extension.slackSendSelection",
+                "key": "ctrl+alt+u"
+        },{
+                "command": "extension.slackSendMsg",
+                "key": "ctrl+alt+n"
+        },{
+                "command": "extension.slackUploadFileCurrent",
+                "key": "ctrl+alt+j"
+        }],
+      "configuration": {
+        "type": "object",
+        "title": "Visual Studio Code Slack configuration",
+        "properties": {
+            "slack.teamToken": {
+                "type": "string",
+                "default": "",
+                "description": "Team token"
+            },
+            "slack.username": {
+                "type": "string",
+                "default": "Code",
+                "description": "Slack username"
+            },
+            "slack.avatarUrl": {
+                "type": "string",
+                "default": "http://i.imgur.com/O8dDZpb.png",
+                "description": "Slack avatar url"
+            }
+        }
+    }
+	},
+	"scripts": {
+		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
+	},
+	"devDependencies": {
+		"typescript": "^1.6.2",
+		"vscode": "0.10.x"
+	}
+}
