@@ -14,12 +14,15 @@ var API_USERS = 'users.list';
 var API_GROUPS = 'groups.list';
 var API_POST_MESSAGE = 'chat.postMessage';
 var API_UPLOAD_FILES = 'files.upload';
+var API_SET_SNOOZE = 'dnd.setSnooze';
+var API_END_SNOOZE = 'dnd.endSnooze';
         
 class Slack
 {
-     private _statusBarItem: vscode.StatusBarItem;
+     private _statusBarItem: vscode.StatusBarItem;   
+     private savedChannel: string;
      
-     public GetChannelList(callback, type:string, data)
+     private GetChannelList(callback, type:string, data)
      {  
         var params = '?token='+teamToken+'&exclude_archived=1';
         channelList.length = 0;
@@ -83,7 +86,7 @@ class Slack
         }); 
      }
      
-     public ApiCall(apiType:string, data) {
+     private ApiCall(apiType:string, data?) {
          var that = this;
          
         if (!this._statusBarItem) { 
@@ -95,18 +98,28 @@ class Slack
             formData: data
         }, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
-                    that._statusBarItem.text = "$(comment) Message sent successfully!";
+                    switch(apiType) {
+                        case API_SET_SNOOZE: case API_END_SNOOZE:
+                            that._statusBarItem.text = "$(bell) Status set successfully!";
+                            break;
+                        case API_UPLOAD_FILES:
+                            that._statusBarItem.text = "$(file-text) File sent successfully!";
+                            break;
+                        default:
+                            that._statusBarItem.text = "$(comment) Message sent successfully!";
+                            break;
+                    }
                     that._statusBarItem.show(); 
+                    setTimeout(function() { that._statusBarItem.hide()}, 5000 );
                 }
-                setTimeout(function() { that._statusBarItem.hide()}, 5000 );
         });
      }
      
-     public QuickPick() {
+     private QuickPick() {
        return vscode.window.showQuickPick(channelList, { matchOnDescription: true, placeHolder: 'Select a channel' }); 
      }
      
-     public Send(type:string, data) {
+     private Send(type:string, data) {
             var sendMsg = function(type, data) {
                 if(data) {
                     var s = new Slack();
@@ -134,8 +147,11 @@ class Slack
      
      // Upload file from path
      public UploadFilePath() {
-         vscode.window.showInputBox('Please enter a path').then(path => {
-             if(path.toString()) {
+        var options = {
+            prompt: "Please enter a path"
+        };
+         vscode.window.showInputBox(options).then(path => {
+             if(path) {
                  var data = {
                     channels: '',
                     token   : teamToken,
@@ -176,7 +192,11 @@ class Slack
      }
      
      public SendMessage() {
-         vscode.window.showInputBox('Please enter a message').then(text => {
+        var options = {
+            prompt: "Please enter a message",
+            value: this.savedChannel
+        };
+         vscode.window.showInputBox(options).then(text => {
              if(text) {
                   var data = {
                     channel : '',
@@ -186,10 +206,13 @@ class Slack
                     text    : text
                  };
                  
-                 if(text.startsWith("@") || text.startsWith("#"))
-                 {
+                 if(text.startsWith("@") || text.startsWith("#")) {
                     data.channel = text.substr(0, text.indexOf(' '));
+                    this.savedChannel = data.channel + " ";  // remember last used channel
                     data.text = text.substr(text.indexOf(' ')+1);
+                 }
+                 else {
+                     this.savedChannel = ""; // clear saved channel
                  }
                  
                  this.GetChannelList(this.Send, API_POST_MESSAGE, data);
@@ -205,7 +228,7 @@ class Slack
 
         var selection = editor.selection;
         var text = editor.document.getText(selection);
-        
+ 
         var data = {
             channel : '',
             token   : teamToken,
@@ -215,6 +238,28 @@ class Slack
         };
 
         this.GetChannelList(this.Send, API_POST_MESSAGE, data);
+    }
+    
+    public SetSnooze() {
+        var options = {
+            prompt: "Please enter number of minutes"
+        };
+        vscode.window.showInputBox(options).then(num_minutes => {
+             if(num_minutes) {
+                var data = {
+                    token      : teamToken,
+                    num_minutes: num_minutes
+                };
+                this.ApiCall(API_SET_SNOOZE, data);
+             }
+        });
+    }
+    
+    public EndSnooze() {
+        var data = {
+            token: teamToken
+        };
+        this.ApiCall(API_END_SNOOZE, data);
     }
         
     dispose() {
@@ -227,7 +272,6 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
-    
     if(teamToken) {
         let slack = new Slack();
         // send typed message
@@ -240,6 +284,10 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('extension.slackUploadFileSelection', () => slack.UploadFileSelection());
         // upload file path
         vscode.commands.registerCommand('extension.slackUploadFilePath', () => slack.UploadFilePath());
+        // snooze controls
+        vscode.commands.registerCommand('extension.slackSetSnooze', () => slack.SetSnooze());
+        vscode.commands.registerCommand('extension.slackEndSnooze', () => slack.EndSnooze());
+        
         // Add to a list of disposables which are disposed when this extension is deactivated.
         context.subscriptions.push(slack);
     }

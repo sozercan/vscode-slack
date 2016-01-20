@@ -1,7 +1,7 @@
 {
 	"name": "slack",
 	"displayName": "Slack integration",
-	"description": "Slack integration for Visual Studio Code",
+	"description": "Send messages and files to Slack from Visual Studio Code",
     "icon": "icon.png",
 	"version": "0.0.1",
 	"publisher": "sozercan",
@@ -40,7 +40,9 @@
         "onCommand:extension.slackSendSelection",
         "onCommand:extension.slackUploadFilePath",
         "onCommand:extension.slackUploadFileCurrent",
-        "onCommand:extension.slackUploadFileSelection"
+        "onCommand:extension.slackUploadFileSelection",
+        "onCommand:extension.slackSetSnooze",
+        "onCommand:extension.slackEndSnooze"
 	],
 	"main": "./out/src/extension",
 	"contributes": {
@@ -59,6 +61,12 @@
 		},{
 			"command": "extension.slackUploadFileSelection",
 			"title": "Slack: Upload Selection as File"
+		},{
+			"command": "extension.slackSetSnooze",
+			"title": "Slack: Set Snooze"
+		},{
+			"command": "extension.slackEndSnooze",
+			"title": "Slack: End Snooze"
 		}],
         "keybindings": [{
                 "command": "extension.slackSendSelection",
