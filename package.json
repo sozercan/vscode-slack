@@ -1,9 +1,9 @@
 {
 	"name": "slack",
-	"displayName": "Slack integration",
+	"displayName": "Slack",
 	"description": "Send messages and files to Slack from Visual Studio Code",
     "icon": "icon.png",
-	"version": "0.0.1",
+	"version": "0.0.8",
 	"publisher": "sozercan",
     "author": {
         "name": "Sertac Ozercan",

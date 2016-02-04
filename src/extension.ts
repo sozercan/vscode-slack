@@ -227,7 +227,7 @@ class Slack
         }
 
         var selection = editor.selection;
-        var text = editor.document.getText(selection);
+        var text = '```'+editor.document.getText(selection)+'```';
  
         var data = {
             channel : '',
