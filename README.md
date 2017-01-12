@@ -19,7 +19,7 @@ Go to User Settings (File > Preferences > User Settings) and add the following
 ```
 
 * ##### `"teamToken"` (required)
-    * You can get the token from https://api.slack.com/web#auth 
+    * You can get the token from https://api.slack.com/docs/oauth-test-tokens
 
 * ##### `"username"` (optional)
     * **defaults to "Code"**
