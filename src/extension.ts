@@ -166,14 +166,23 @@ class Slack
      // Upload current file
      public UploadFileCurrent() {
         var document = vscode.window.activeTextEditor.document.getText();
-        
-        var data = {
-            channels: '',
-            token   : teamToken,
-            content : document
+        var options = {
+            prompt: "Please enter a file extension"
         };
+        var data;
+        vscode.window.showInputBox(options).then(type => {
         
-        this.GetChannelList(this.Send, API_UPLOAD_FILES, data); 
+            data = {
+                channels: '',
+                token   : teamToken,
+                content : document,
+                filetype: type
+            };
+
+            this.GetChannelList(this.Send, API_UPLOAD_FILES, data);         
+        }); 
+
+        
      }
      
      // Upload selection as file
