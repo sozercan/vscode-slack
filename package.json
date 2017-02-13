@@ -3,7 +3,7 @@
 	"displayName": "Slack",
 	"description": "Send messages and files to Slack from Visual Studio Code",
     "icon": "icon.png",
-	"version": "0.0.9",
+	"version": "0.0.13",
 	"publisher": "sozercan",
     "author": {
         "name": "Sertac Ozercan",
@@ -24,7 +24,7 @@
         "theme": "light"
     },
 	"engines": {
-		"vscode": "^0.10.1"
+		"vscode": "^1.3.0"
 	},
 	"categories": [
 		"Other"
@@ -36,46 +36,56 @@
         "collaboration"
     ],
 	"activationEvents": [
-		"onCommand:extension.slackSendMsg",
-        "onCommand:extension.slackSendSelection",
-        "onCommand:extension.slackUploadFilePath",
-        "onCommand:extension.slackUploadFileCurrent",
-        "onCommand:extension.slackUploadFileSelection",
-        "onCommand:extension.slackSetSnooze",
-        "onCommand:extension.slackEndSnooze"
+		"onCommand:slack.slackSendMsg",
+        "onCommand:slack.slackSendSelection",
+        "onCommand:slack.slackUploadFilePath",
+        "onCommand:slack.slackUploadFileCurrent",
+        "onCommand:slack.slackUploadFileSelection",
+        "onCommand:slack.slackSetSnooze",
+        "onCommand:slack.slackEndSnooze"
 	],
-	"main": "./out/src/extension",
+	"main": "./out/extension",
 	"contributes": {
+        "menus": {
+            "editor/context": [{
+                "when": "editorHasSelection",
+                "command": "slack.slackUploadFileSelection",
+                "group": "navigation"
+            }, {
+                "command": "slack.slackUploadFileCurrent",
+                "group": "navigation"
+            }]
+        },
 		"commands": [{
-			"command": "extension.slackSendMsg",
-			"title": "Slack: Send Message"
-		},{
-        	"command": "extension.slackSendSelection",
-			"title": "Slack: Send Selection"
-        },{
-			"command": "extension.slackUploadFilePath",
-			"title": "Slack: Upload File From Path"
-		},{
-			"command": "extension.slackUploadFileCurrent",
-			"title": "Slack: Upload Current File"
-		},{
-			"command": "extension.slackUploadFileSelection",
-			"title": "Slack: Upload Selection as File"
-		},{
-			"command": "extension.slackSetSnooze",
-			"title": "Slack: Set Snooze"
-		},{
-			"command": "extension.slackEndSnooze",
-			"title": "Slack: End Snooze"
+                "command": "slack.slackSendMsg",
+                "title": "Slack: Send Message"
+            },{
+                "command": "slack.slackSendSelection",
+                "title": "Slack: Send Selection"
+            },{
+                "command": "slack.slackUploadFilePath",
+                "title": "Slack: Upload File From Path"
+            },{
+                "command": "slack.slackUploadFileCurrent",
+                "title": "Slack: Upload Current File"
+            },{
+                "command": "slack.slackUploadFileSelection",
+                "title": "Slack: Upload Selection as File"
+            },{
+                "command": "slack.slackSetSnooze",
+                "title": "Slack: Set Snooze"
+            },{
+                "command": "slack.slackEndSnooze",
+                "title": "Slack: End Snooze"
 		}],
         "keybindings": [{
-                "command": "extension.slackSendSelection",
+                "command": "slack.slackSendSelection",
                 "key": "ctrl+alt+u"
-        },{
-                "command": "extension.slackSendMsg",
+            },{
+                "command": "slack.slackSendMsg",
                 "key": "ctrl+alt+n"
-        },{
-                "command": "extension.slackUploadFileCurrent",
+            },{
+                "command": "slack.slackUploadFileCurrent",
                 "key": "ctrl+alt+j"
         }],
         "configuration": {
@@ -105,11 +115,15 @@
         "compile": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
+    "dependencies": {
+        "request": "^2.79.0"
+    },
 	"devDependencies": {
 		"typescript": "^2.1.6",
 		"vscode": "^1.0.3",
         "mocha": "^3.2.0",
         "@types/node": "^7.0.5",
-        "@types/mocha": "^2.2.39"
+        "@types/mocha": "^2.2.39",
+        "@types/request": "^0.0.39"
 	}
 }

@@ -1,10 +1,10 @@
-import * as vscode from 'vscode'; 
-var request = require('request');
+import * as vscode from 'vscode';
+import * as request from 'request';
 var fs = require('fs');
 
 var channelList = [];
 var configuration = vscode.workspace.getConfiguration('slack');
-var teamToken = configuration.get('teamToken'); 
+var teamToken = configuration.get('teamToken');
 var username = configuration.get('username');
 var avatarUrl = configuration.get('avatarUrl');
 
@@ -16,14 +16,14 @@ var API_POST_MESSAGE = 'chat.postMessage';
 var API_UPLOAD_FILES = 'files.upload';
 var API_SET_SNOOZE = 'dnd.setSnooze';
 var API_END_SNOOZE = 'dnd.endSnooze';
-        
+
 class Slack
 {
-     private _statusBarItem: vscode.StatusBarItem;   
+     private _statusBarItem: vscode.StatusBarItem;
      private savedChannel: string;
-     
+
      private GetChannelList(callback, type:string, data)
-     {  
+     {
         var params = '?token='+teamToken+'&exclude_archived=1';
         channelList.length = 0;
         var __request = function (urls, callback) {
@@ -35,13 +35,13 @@ class Slack
                 };
             while (t--) { request(urls[t], handler); }
         };
-        
+
         var urls = [BASE_URL+API_CHANNELS+params, BASE_URL+API_GROUPS+params, BASE_URL+API_USERS+params];
-        
+
         __request(urls, function(responses) {
 
             var url, response;
-        
+
             for (url in responses) {
                 // reference to the response object
                 response = responses[url];
@@ -61,17 +61,17 @@ class Slack
                         for(let i = 0; i < r.channels.length; i++) {
                             let c = r.channels[i];
                             channelList.push( { id : c.id, label : '#' + c.name } );
-                        }       
+                        }
                     }
-                    
+
                     if(r.groups)
                     {
                         for(let i = 0; i < r.groups.length; i++) {
                             let c = r.groups[i];
                             channelList.push( { id : c.id, label : '#' + c.name, description : c.topic.value } );
-                        }   
+                        }
                     }
-                    
+
                     if(r.members)
                     {
                         for(let i = 0; i < r.members.length; i++) {
@@ -80,21 +80,21 @@ class Slack
                         }
                     }
                 }
-            }     
-            
+            }
+
             callback && callback(type, data);
-        }); 
+        });
      }
-     
+
      private ApiCall(apiType:string, data?) {
          var that = this;
-         
-        if (!this._statusBarItem) { 
-            this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left); 
+
+        if (!this._statusBarItem) {
+            this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         }
-        
+
         request.post({
-            url: BASE_URL+apiType, 
+            url: BASE_URL+apiType,
             formData: data
         }, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
@@ -109,24 +109,24 @@ class Slack
                             that._statusBarItem.text = "$(comment) Message sent successfully!";
                             break;
                     }
-                    that._statusBarItem.show(); 
+                    that._statusBarItem.show();
                     setTimeout(function() { that._statusBarItem.hide()}, 5000 );
                 }
         });
      }
-     
+
      private QuickPick() {
-       return vscode.window.showQuickPick(channelList, { matchOnDescription: true, placeHolder: 'Select a channel' }); 
+       return vscode.window.showQuickPick(channelList, { matchOnDescription: true, placeHolder: 'Select a channel' });
      }
-     
+
      private Send(type:string, data) {
             var sendMsg = function(type, data) {
                 if(data) {
                     var s = new Slack();
-                    s.ApiCall(type, data);                
+                    s.ApiCall(type, data);
                 }
             }
-            
+
             // sending a message to a specified channel/user/group
             if(data.channel) {
                 sendMsg(type, data);
@@ -144,7 +144,7 @@ class Slack
                 });
             }
      }
-     
+
      // Upload file from path
      public UploadFilePath() {
         var options = {
@@ -225,7 +225,7 @@ class Slack
                     icon_url: avatarUrl,
                     text    : text
                  };
-                 
+
                  if(text.startsWith("@") || text.startsWith("#")) {
                     data.channel = text.substr(0, text.indexOf(' '));
                     this.savedChannel = data.channel + " ";  // remember last used channel
@@ -234,12 +234,12 @@ class Slack
                  else {
                      this.savedChannel = ""; // clear saved channel
                  }
-                 
+
                  this.GetChannelList(this.Send, API_POST_MESSAGE, data);
              }
         });
     };
-    
+
     public SendSelection() {
         var editor = vscode.window.activeTextEditor;
         if (!editor) {
@@ -248,7 +248,7 @@ class Slack
 
         var selection = editor.selection;
         var text = '```'+editor.document.getText(selection)+'```';
- 
+
         var data = {
             channel : '',
             token   : teamToken,
@@ -259,7 +259,7 @@ class Slack
 
         this.GetChannelList(this.Send, API_POST_MESSAGE, data);
     }
-    
+
     public SetSnooze() {
         var options = {
             prompt: "Please enter number of minutes"
@@ -274,14 +274,14 @@ class Slack
              }
         });
     }
-    
+
     public EndSnooze() {
         var data = {
             token: teamToken
         };
         this.ApiCall(API_END_SNOOZE, data);
     }
-        
+
     dispose() {
     }
 }
@@ -295,19 +295,19 @@ export function activate(context: vscode.ExtensionContext) {
     if(teamToken) {
         let slack = new Slack();
         // send typed message
-        vscode.commands.registerCommand('extension.slackSendMsg', () => slack.SendMessage());
+        vscode.commands.registerCommand('slack.slackSendMsg', () => slack.SendMessage());
         // send selected text as a message
-        vscode.commands.registerCommand('extension.slackSendSelection', () => slack.SendSelection());
+        vscode.commands.registerCommand('slack.slackSendSelection', () => slack.SendSelection());
         // upload current file
-        vscode.commands.registerCommand('extension.slackUploadFileCurrent', () => slack.UploadFileCurrent());
+        vscode.commands.registerCommand('slack.slackUploadFileCurrent', () => slack.UploadFileCurrent());
         // upload selection
-        vscode.commands.registerCommand('extension.slackUploadFileSelection', () => slack.UploadFileSelection());
+        vscode.commands.registerCommand('slack.slackUploadFileSelection', () => slack.UploadFileSelection());
         // upload file path
-        vscode.commands.registerCommand('extension.slackUploadFilePath', () => slack.UploadFilePath());
+        vscode.commands.registerCommand('slack.slackUploadFilePath', () => slack.UploadFilePath());
         // snooze controls
-        vscode.commands.registerCommand('extension.slackSetSnooze', () => slack.SetSnooze());
-        vscode.commands.registerCommand('extension.slackEndSnooze', () => slack.EndSnooze());
-        
+        vscode.commands.registerCommand('slack.slackSetSnooze', () => slack.SetSnooze());
+        vscode.commands.registerCommand('slack.slackEndSnooze', () => slack.EndSnooze());
+
         // Add to a list of disposables which are disposed when this extension is deactivated.
         context.subscriptions.push(slack);
     }
