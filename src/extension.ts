@@ -160,64 +160,29 @@ class Slack
 
                 this.GetChannelList(this.Send, API_UPLOAD_FILES, data);
              }
-        });              
+        });
      }
-     
+
      // Upload current file
      public UploadFileCurrent() {
         var document = vscode.window.activeTextEditor.document.getText();
-        var options = {
-            prompt: "Please enter a file extension"
-        };
-        var data;
-        
-        if(vscode.window.activeTextEditor.document.isUntitled){
-            vscode.window.showInputBox(options).then(type => {
-            
-                data = {
-                    channels: '',
-                    token   : teamToken,
-                    content : document,
-                    filetype: type
-                };
-
-                this.GetChannelList(this.Send, API_UPLOAD_FILES, data);         
-            }); 
-        } else {
-            var filename_with_path = vscode.window.activeTextEditor.document.fileName;
-            var filename;
-            if(filename_with_path.indexOf("\\") != -1){
-                filename = filename_with_path.substring(filename_with_path.lastIndexOf("\\") + 1);
-            }
-            else {
-                filename = filename_with_path.substring(filename_with_path.lastIndexOf("/") + 1);
-            } 
-            data = {
-                    channels: '',
-                    token   : teamToken,
-                    content : document,
-                    filename: filename
-            };
-
-            this.GetChannelList(this.Send, API_UPLOAD_FILES, data);    
-        }
-        
+        this.Upload(document);
      }
-     
+
      // Upload selection as file
      public UploadFileSelection() {
-        var editor = vscode.window.activeTextEditor;         
-        var selection = editor.selection;
-        var document = vscode.window.activeTextEditor.document.getText(selection);
-        
-        var data ;
-        var options = {
-            prompt: "Please enter a file extension"
-        };
+        var document = vscode.window.activeTextEditor.document.getText(vscode.window.activeTextEditor.selection);
+        this.Upload(document);
+     }
 
-        if(vscode.window.activeTextEditor.document.isUntitled){
+     public Upload(document) {
+        var data;
+
+        if(vscode.window.activeTextEditor.document.isUntitled) {
+            var options = { prompt: "Please enter a file extension" };
+
             vscode.window.showInputBox(options).then(type => {
-            
+
                 data = {
                     channels: '',
                     token   : teamToken,
@@ -225,8 +190,8 @@ class Slack
                     filetype: type
                 };
 
-                this.GetChannelList(this.Send, API_UPLOAD_FILES, data);         
-            }); 
+                this.GetChannelList(this.Send, API_UPLOAD_FILES, data);
+            });
         } else {
             var filename_with_path = vscode.window.activeTextEditor.document.fileName;
             var filename;
@@ -235,20 +200,17 @@ class Slack
             }
             else {
                 filename = filename_with_path.substring(filename_with_path.lastIndexOf("/") + 1);
-            } 
+            }
             data = {
                     channels: '',
                     token   : teamToken,
                     content : document,
                     filename: filename
             };
-
-            this.GetChannelList(this.Send, API_UPLOAD_FILES, data);    
+            this.GetChannelList(this.Send, API_UPLOAD_FILES, data);
         }
-        
-        //this.GetChannelList(this.Send, API_UPLOAD_FILES, data); 
      }
-     
+
      public SendMessage() {
         var options = {
             prompt: "Please enter a message",
