@@ -303,24 +303,36 @@ function cleanupDisposables() {
     }
 }
 
+let isReloadingConfiguration = false;
 function reloadConfiguration() {
-    cleanupDisposables();
-
-    const NEW_CONFIG = configuration = vscode.workspace.getConfiguration('slack');
-
-    const NEW_TEAM_TOKEN = teamToken = NEW_CONFIG.get('teamToken');
-    username = NEW_CONFIG.get('username');
-    avatarUrl = NEW_CONFIG.get('avatarUrl');
-
-    slack = null;
-
-    if (NEW_TEAM_TOKEN) {
-        disposables.push(
-            slack = new Slack(),
-        );
+    if (isReloadingConfiguration) {
+        return;
     }
-    else {
-        vscode.window.showErrorMessage('Please enter a team token to use this extension.');
+
+    try {
+        isReloadingConfiguration = true;
+
+        cleanupDisposables();
+
+        const NEW_CONFIG = configuration = vscode.workspace.getConfiguration('slack');
+
+        const NEW_TEAM_TOKEN = teamToken = NEW_CONFIG.get('teamToken');
+        username = NEW_CONFIG.get('username');
+        avatarUrl = NEW_CONFIG.get('avatarUrl');
+
+        slack = null;
+
+        if (NEW_TEAM_TOKEN) {
+            disposables.push(
+                slack = new Slack(),
+            );
+        }
+        else {
+            vscode.window.showErrorMessage('Please enter a team token to use this extension.');
+        }
+    }
+    finally {
+        isReloadingConfiguration = false;
     }
 }
 
