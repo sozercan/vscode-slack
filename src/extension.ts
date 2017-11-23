@@ -3,10 +3,12 @@ import * as request from 'request';
 var fs = require('fs');
 
 var channelList = [];
-var configuration = vscode.workspace.getConfiguration('slack');
-var teamToken = configuration.get('teamToken');
-var username = configuration.get('username');
-var avatarUrl = configuration.get('avatarUrl');
+var configuration: vscode.WorkspaceConfiguration;
+var disposables: vscode.Disposable[] = [];
+var extension: vscode.ExtensionContext;
+var teamToken;
+var username;
+var avatarUrl;
 
 var BASE_URL = 'https://slack.com/api/';
 var API_CHANNELS = 'channels.list';
@@ -286,36 +288,73 @@ class Slack
     }
 }
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-    if(teamToken) {
-        let slack = new Slack();
-        // send typed message
-        vscode.commands.registerCommand('slack.slackSendMsg', () => slack.SendMessage());
-        // send selected text as a message
-        vscode.commands.registerCommand('slack.slackSendSelection', () => slack.SendSelection());
-        // upload current file
-        vscode.commands.registerCommand('slack.slackUploadFileCurrent', () => slack.UploadFileCurrent());
-        // upload selection
-        vscode.commands.registerCommand('slack.slackUploadFileSelection', () => slack.UploadFileSelection());
-        // upload file path
-        vscode.commands.registerCommand('slack.slackUploadFilePath', () => slack.UploadFilePath());
-        // snooze controls
-        vscode.commands.registerCommand('slack.slackSetSnooze', () => slack.SetSnooze());
-        vscode.commands.registerCommand('slack.slackEndSnooze', () => slack.EndSnooze());
+let slack: Slack;
 
-        // Add to a list of disposables which are disposed when this extension is deactivated.
-        context.subscriptions.push(slack);
+function cleanupDisposables() {
+    while (disposables.length > 0) {
+        const DISP = disposables.shift();
+
+        try {
+            DISP.dispose();
+        }
+        catch (e) {
+            //TODO: ignore or log    
+        }
+    }
+}
+
+function reloadConfiguration() {
+    cleanupDisposables();
+
+    const NEW_CONFIG = configuration = vscode.workspace.getConfiguration('slack');
+
+    const NEW_TEAM_TOKEN = teamToken = NEW_CONFIG.get('teamToken');
+    username = NEW_CONFIG.get('username');
+    avatarUrl = NEW_CONFIG.get('avatarUrl');
+
+    slack = null;
+
+    if (NEW_TEAM_TOKEN) {
+        disposables.push(
+            slack = new Slack(),
+        );
     }
     else {
         vscode.window.showErrorMessage('Please enter a team token to use this extension.');
     }
 }
 
-// this method is called when your extension is deactivated
+
+// this function is called when the extension is activated
+export function activate(context: vscode.ExtensionContext) {
+    extension = context;
+
+    // commands
+    context.subscriptions.push(
+        // send typed message
+        vscode.commands.registerCommand('slack.slackSendMsg', () => slack.SendMessage()),
+        // send selected text as a message
+        vscode.commands.registerCommand('slack.slackSendSelection', () => slack.SendSelection()),
+        // upload current file
+        vscode.commands.registerCommand('slack.slackUploadFileCurrent', () => slack.UploadFileCurrent()),
+        // upload selection
+        vscode.commands.registerCommand('slack.slackUploadFileSelection', () => slack.UploadFileSelection()),
+        // upload file path
+        vscode.commands.registerCommand('slack.slackUploadFilePath', () => slack.UploadFilePath()),
+        // snooze controls
+        vscode.commands.registerCommand('slack.slackSetSnooze', () => slack.SetSnooze()),
+        vscode.commands.registerCommand('slack.slackEndSnooze', () => slack.EndSnooze()),
+    );
+
+    // reload configuration, when changed
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeConfiguration(() => reloadConfiguration()),
+    );
+
+    reloadConfiguration();
+}
+
+// this function is called when the extension is deactivated
 export function deactivate() {
+    cleanupDisposables();
 }

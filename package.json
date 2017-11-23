@@ -1,10 +1,10 @@
 {
-	"name": "slack",
-	"displayName": "Slack",
-	"description": "Send messages and files to Slack from Visual Studio Code",
+    "name": "slack",
+    "displayName": "Slack",
+    "description": "Send messages and files to Slack from Visual Studio Code",
     "icon": "icon.png",
-	"version": "0.0.13",
-	"publisher": "sozercan",
+    "version": "0.0.14",
+    "publisher": "sozercan",
     "author": {
         "name": "Sertac Ozercan",
         "email": "sozercan@gmail.com",
@@ -23,74 +23,90 @@
         "color": "#FFFFFF",
         "theme": "light"
     },
-	"engines": {
-		"vscode": "^1.3.0"
-	},
-	"categories": [
-		"Other"
-	],
+    "engines": {
+        "vscode": "^1.3.0"
+    },
+    "categories": [
+        "Other"
+    ],
     "keywords": [
         "Slack",
         "chat",
         "communication",
         "collaboration"
     ],
-	"activationEvents": [
-		"onCommand:slack.slackSendMsg",
+    "activationEvents": [
+        "onCommand:slack.slackSendMsg",
         "onCommand:slack.slackSendSelection",
         "onCommand:slack.slackUploadFilePath",
         "onCommand:slack.slackUploadFileCurrent",
         "onCommand:slack.slackUploadFileSelection",
         "onCommand:slack.slackSetSnooze",
         "onCommand:slack.slackEndSnooze"
-	],
-	"main": "./out/extension",
-	"contributes": {
+    ],
+    "main": "./out/extension",
+    "contributes": {
         "menus": {
-            "editor/context": [{
-                "when": "editorHasSelection",
-                "command": "slack.slackUploadFileSelection",
-                "group": "navigation"
-            }, {
-                "command": "slack.slackUploadFileCurrent",
-                "group": "navigation"
-            }]
+            "editor/context": [
+                {
+                    "when": "editorHasSelection",
+                    "command": "slack.slackUploadFileSelection",
+                    "group": "navigation"
+                },
+                {
+                    "command": "slack.slackUploadFileCurrent",
+                    "group": "navigation"
+                }
+            ]
         },
-		"commands": [{
+        "commands": [
+            {
                 "command": "slack.slackSendMsg",
                 "title": "Slack: Send Message"
-            },{
+            },
+            {
                 "command": "slack.slackSendSelection",
                 "title": "Slack: Send Selection"
-            },{
+            },
+            {
                 "command": "slack.slackUploadFilePath",
                 "title": "Slack: Upload File From Path"
-            },{
+            },
+            {
                 "command": "slack.slackUploadFileCurrent",
                 "title": "Slack: Upload Current File"
-            },{
+            },
+            {
                 "command": "slack.slackUploadFileSelection",
                 "title": "Slack: Upload Selection as File"
-            },{
+            },
+            {
                 "command": "slack.slackSetSnooze",
                 "title": "Slack: Set Snooze"
-            },{
+            },
+            {
                 "command": "slack.slackEndSnooze",
                 "title": "Slack: End Snooze"
-		}],
-        "keybindings": [{
+            }
+        ],
+        "keybindings": [
+            {
                 "command": "slack.slackSendSelection",
                 "key": "ctrl+alt+u"
-            },{
+            },
+            {
                 "command": "slack.slackSendMsg",
                 "key": "ctrl+alt+n"
-            },{
+            },
+            {
                 "command": "slack.slackUploadFileCurrent",
                 "key": "ctrl+alt+j"
-        }],
+            }
+        ],
         "configuration": {
             "type": "object",
             "title": "Visual Studio Code Slack configuration",
+            
             "properties": {
                 "slack.teamToken": {
                     "type": "string",
@@ -109,7 +125,7 @@
                 }
             }
         }
-	},
+    },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
         "compile": "tsc -watch -p ./",
@@ -118,12 +134,12 @@
     "dependencies": {
         "request": "^2.79.0"
     },
-	"devDependencies": {
-		"typescript": "^2.1.6",
-		"vscode": "^1.0.3",
+    "devDependencies": {
+        "typescript": "^2.1.6",
+        "vscode": "^1.0.3",
         "mocha": "^3.2.0",
         "@types/node": "^7.0.5",
         "@types/mocha": "^2.2.39",
         "@types/request": "^0.0.39"
-	}
+    }
 }
