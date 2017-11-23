@@ -313,14 +313,13 @@ function reloadConfiguration() {
         isReloadingConfiguration = true;
 
         cleanupDisposables();
+        slack = null;
 
         const NEW_CONFIG = configuration = vscode.workspace.getConfiguration('slack');
 
         const NEW_TEAM_TOKEN = teamToken = NEW_CONFIG.get('teamToken');
         username = NEW_CONFIG.get('username');
         avatarUrl = NEW_CONFIG.get('avatarUrl');
-
-        slack = null;
 
         if (NEW_TEAM_TOKEN) {
             disposables.push(
