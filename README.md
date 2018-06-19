@@ -15,7 +15,8 @@ Go to User Settings (File > Preferences > User Settings) and add the following
 ```
     	"slack.teamToken": "<your team token>",
         "slack.username": "<your username>",
-        "slack.avatarUrl" : "<your avatar url>"
+        "slack.avatarUrl" : "<your avatar url>",
+        "slack.postAsUser" : true|false
 ```
 
 * ##### `"teamToken"` (required)
@@ -27,6 +28,10 @@ Go to User Settings (File > Preferences > User Settings) and add the following
 
 * ##### `"avatarUrl"` (optional)
     * Image for the avatar
+
+* ##### `"postAsUser"` (optional)
+    * **defaults to `false`**
+    * Set to true to post messages as the authed user, instead of as a bot''
 
 ### Features
 * Send messages to
