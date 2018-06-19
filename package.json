@@ -121,6 +121,11 @@
                     "type": "string",
                     "default": "http://i.imgur.com/O8dDZpb.png",
                     "description": "Slack avatar url"
+                },
+                "slack.postAsUser": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Post the message as the authed user, instead of as a bot"
                 }
             }
         }

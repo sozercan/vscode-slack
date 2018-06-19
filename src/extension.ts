@@ -9,6 +9,7 @@ var extension: vscode.ExtensionContext;
 var teamToken;
 var username;
 var avatarUrl;
+var postAsUser;
 
 var BASE_URL = 'https://slack.com/api/';
 var API_CHANNELS = 'channels.list';
@@ -225,7 +226,8 @@ class Slack
                     token   : teamToken,
                     username: username,
                     icon_url: avatarUrl,
-                    text    : text
+                    text    : text,
+                    as_user : postAsUser
                  };
 
                  if(text.startsWith("@") || text.startsWith("#")) {
@@ -256,7 +258,8 @@ class Slack
             token   : teamToken,
             username: username,
             icon_url: avatarUrl,
-            text    : text
+            text    : text,
+            as_user : postAsUser
         };
 
         this.GetChannelList(this.Send, API_POST_MESSAGE, data);
@@ -312,6 +315,7 @@ function reloadConfiguration() {
     const NEW_TEAM_TOKEN = teamToken = NEW_CONFIG.get('teamToken');
     username = NEW_CONFIG.get('username');
     avatarUrl = NEW_CONFIG.get('avatarUrl');
+    postAsUser = String(NEW_CONFIG.get('postAsUser'));
 
     if (NEW_TEAM_TOKEN) {
         disposables.push(
